@@ -12,8 +12,8 @@ public class DateTimeExtensions_Tests
         var (lower, upper) = date.ToMonthDateTimeRange();
 
         // assert
-        Assert.Equal(date.Month, lower.AddTicks(1).Month);
-        Assert.Equal(date.Month, upper.AddTicks(-1).Month);
+        Assert.Equal(date.Month, lower.AddSeconds(1).Month);
+        Assert.Equal(date.Month, upper.AddSeconds(-1).Month);
     }
 
     [Fact]

@@ -29,8 +29,12 @@ public class NotificationRepository : INotificationRepository
     public async Task<int> WriteNotifications(DateTime seed, CancellationToken token)
     {
         var (lower, upper) = seed.ToMonthUnixTimestampRange();
-        var existingNotifications = await _context.Notifications.AsNoTracking().Where(x => x.Timestamp > lower && x.Timestamp < upper).ToArrayAsync();
-        var configs = await _configRepository.GetConfigFull(token);
+        var existing = await _context.Notifications.AsNoTracking()
+            .Where(x => x.Timestamp >= lower && x.Timestamp <= upper)
+            .ToArrayAsync();
+
+        var cache = existing.Select(x => CalculateHash(x)).ToHashSet();
+        var configs = await _configRepository.GetConfigs(token);
         var cronMap = await _cronMaskRepository.GetIdUnixTimestampMap(seed, token);
 
         var list = new List<Notification>();
@@ -44,19 +48,19 @@ public class NotificationRepository : INotificationRepository
                     Timestamp = cronMap[config.CronMaskId]
                 });
         }
-        var existingSet = existingNotifications is not null
-            ? existingNotifications.Select(x => CalculateHash(x)).ToHashSet()
-            : new HashSet<int>();
 
-        var newNotifications = list.Where(x => !existingSet.Contains(CalculateHash(x))).ToArray();
+        var newNotifications = list.Where(x => !cache.Contains(CalculateHash(x))).ToArray();
 
         if (newNotifications is null || newNotifications.Length == 0)
             return 0;
         
         await _context.Notifications.AddRangeAsync(newNotifications);
-        return await _context.SaveChangesAsync();
+        var count = await _context.SaveChangesAsync();
+        if (count > 0)
+            _logger.LogInformation("{count} new notification entries have been written to database", count);
+        return count;
     }
 
     private static int CalculateHash(Notification notification)
-        => notification.CompanyTypeId ^ notification.MarketId ^ notification.Timestamp;
+        => 397 * notification.CompanyTypeId ^ notification.MarketId ^ notification.Timestamp;
 }

@@ -24,14 +24,14 @@ internal class CronMaskMapping : IEntityTypeConfiguration<CronMask>
         
         builder.HasData
         (
-            new CronMask() { Mask = "0 0 1 * *" },  //1
-            new CronMask() { Mask = "0 0 5 * *" },  //2
-            new CronMask() { Mask = "0 0 7 * *" },  //3
-            new CronMask() { Mask = "0 0 10 * *" }, //4
-            new CronMask() { Mask = "0 0 14 * *" }, //5
-            new CronMask() { Mask = "0 0 15 * *" }, //6
-            new CronMask() { Mask = "0 0 20 * *" }, //7
-            new CronMask() { Mask = "0 0 28 * *" }  //8
+            new CronMask() { Id = 1, Mask = "0 0 1 * *" }, 
+            new CronMask() { Id = 2, Mask = "0 0 5 * *" },
+            new CronMask() { Id = 3, Mask = "0 0 7 * *" },
+            new CronMask() { Id = 4, Mask = "0 0 10 * *" },
+            new CronMask() { Id = 5, Mask = "0 0 14 * *" },
+            new CronMask() { Id = 6, Mask = "0 0 15 * *" },
+            new CronMask() { Id = 7, Mask = "0 0 20 * *" },
+            new CronMask() { Id = 8, Mask = "0 0 28 * *" }
         );
     }
 }

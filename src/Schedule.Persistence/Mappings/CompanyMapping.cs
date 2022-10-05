@@ -24,9 +24,9 @@ internal class CompanyMapping : IEntityTypeConfiguration<Company>
         builder
             .Property(x => x.Number)
             .IsRequired(true)
-            .HasColumnName("Name");
+            .HasColumnName("Number");
         builder
-            .HasCheckConstraint("CK_Company_Number", "LEN(Number) = 10 AND Number LIKE '[0-9]'")
+            .HasCheckConstraint("CK_Company", "Number LIKE '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]' AND CompanyTypeId > 1")
             .HasIndex(x => x.Number)
             .HasDatabaseName("UQ_Company_Number")
             .IsUnique(true);
@@ -59,7 +59,7 @@ internal class CompanyMapping : IEntityTypeConfiguration<Company>
                 Name = "scheduled company",
                 Number = "0123456789",
                 // small
-                CompanyTypeId = 1,
+                CompanyTypeId = 2,
                 // Denmark
                 MarketId = 1
             },
@@ -69,7 +69,7 @@ internal class CompanyMapping : IEntityTypeConfiguration<Company>
                 Name = "unscheduled company",
                 Number = "1231231234",
                 // large
-                CompanyTypeId = 3,
+                CompanyTypeId = 4,
                 // Sweden
                 MarketId = 3
             },
@@ -78,8 +78,8 @@ internal class CompanyMapping : IEntityTypeConfiguration<Company>
                 Id = new Guid("ffe5ffdd-9a9e-4be4-88ac-b90614b04ce8"),
                 Name = "*all* company",
                 Number = "4564564567",
-                // small
-                CompanyTypeId = 2,
+                // medium
+                CompanyTypeId = 3,
                 // Norway
                 MarketId = 2
             }

@@ -24,10 +24,10 @@ internal class MarketMapping : IEntityTypeConfiguration<Market>
         
         builder.HasData
         (
-            new Market() { Name = "Denmark" },  //1
-            new Market() { Name = "Norway" },   //2
-            new Market() { Name = "Sweden" },   //3
-            new Market() { Name = "Finland" }   //4
+            new Market() { Id = 1, Name = "Denmark" },
+            new Market() { Id = 2, Name = "Norway" },
+            new Market() { Id = 3, Name = "Sweden" },
+            new Market() { Id = 4, Name = "Finland" }
         );
     }
 }

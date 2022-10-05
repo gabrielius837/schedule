@@ -32,11 +32,11 @@ public class CronMaskRepository : ICronMaskRepository
 
         foreach (var mask in masks)       
         {
-            var datetime = NextCronOccurence(mask.Mask, seed);
+            var datetime = NextCronOccurence(mask.Mask, lower);
             if (datetime is not null && datetime < upper)
                 dict.Add(mask.Id, ((DateTime)datetime).ToUnixTimestamp());
             else
-                _logger.LogWarning("Could not resolve for {cron} with {timestmap", mask.Mask, seed.ToString());
+                _logger.LogWarning("Could not resolve for {cron} with {timestma}", mask.Mask, lower.ToString());
         }
 
         return dict;

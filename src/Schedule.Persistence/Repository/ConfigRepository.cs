@@ -2,7 +2,7 @@ namespace Schedule.Persistence;
 
 public interface IConfigRepository
 {
-    Task<ConfigFull[]> GetConfigFull(CancellationToken token);
+    Task<Config[]> GetConfigs(CancellationToken token);
 }
 
 public class ConfigRepository : IConfigRepository
@@ -17,10 +17,10 @@ public class ConfigRepository : IConfigRepository
         _logger = logger;
     }
 
-    public async Task<ConfigFull[]> GetConfigFull(CancellationToken token)
+    public async Task<Config[]> GetConfigs(CancellationToken token)
     {
-        var list = new List<ConfigFull>();
-        var types = await _context.CompanyTypes.AsNoTracking().ToArrayAsync(token);
+        var list = new List<Config>();
+        var types = await _context.CompanyTypes.AsNoTracking().Where(x => x.Id > 1).ToArrayAsync(token);
         if (types is null || types.Length == 0)
         {
             _logger.LogWarning("No company types were retrieved");
@@ -34,17 +34,39 @@ public class ConfigRepository : IConfigRepository
             return list.ToArray();
         }
 
+        // Due to lack of data integrity from db
+        // I'm trying to ensure entegrity through hash cache
+        var cache = new HashSet<int>();
         foreach (var config in configs)
         {
-            if (config.CompanyTypeId is null)
+            // if company type is all add the rest
+            if (config.CompanyTypeId == 1)
             {
                 foreach (var type in types)
-                    list.Add(new ConfigFull(config.CronMaskId, type.Id, config.MarketId));
+                {
+                    var hash = CalculateHash(config.CronMaskId, type.Id, config.MarketId);
+                    if (!cache.Contains(hash))
+                    {
+                        list.Add(new Config() { CronMaskId = config.CronMaskId, CompanyTypeId = type.Id, MarketId = config.MarketId });
+                        cache.Add(hash);
+                    }
+                    
+                }
             }
             else
-                list.Add(new ConfigFull(config.CronMaskId, (int)config.CompanyTypeId, config.MarketId));
+            {
+                var hash = CalculateHash(config.CronMaskId, config.CompanyTypeId, config.MarketId);
+                if (!cache.Contains(hash))
+                {
+                    list.Add(new Config() { CronMaskId = config.CronMaskId, CompanyTypeId = config.CompanyTypeId, MarketId = config.MarketId });
+                    cache.Add(hash);
+                }
+            }
+                
         }
 
         return list.ToArray();
     }
+
+    public static int CalculateHash(int cronMaskId, int companyTypeId, int marketId) => 397 * cronMaskId ^ companyTypeId ^ marketId;
 }

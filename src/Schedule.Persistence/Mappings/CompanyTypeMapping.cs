@@ -8,8 +8,7 @@ internal class CompanyTypeMapping : IEntityTypeConfiguration<CompanyType>
             .ToTable("CompanyType");
         builder
             .Property(x => x.Id)
-            .HasColumnName("Id")
-            .ValueGeneratedOnAdd();
+            .HasColumnName("Id");
         builder
             .HasKey(x => x.Id)
             .HasName("PK_CompanyType");
@@ -24,9 +23,10 @@ internal class CompanyTypeMapping : IEntityTypeConfiguration<CompanyType>
         
         builder.HasData
         (
-            new CompanyType() { Name = "small" },   //1
-            new CompanyType() { Name = "medium" },  //2
-            new CompanyType() { Name = "large" }    //3
+            new CompanyType() { Id = 1, Name = "all" },     //1
+            new CompanyType() { Id = 2, Name = "small" },   //2
+            new CompanyType() { Id = 3, Name = "medium" },  //3
+            new CompanyType() { Id = 4, Name = "large" }    //4
         );
     }
 }

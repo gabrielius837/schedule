@@ -16,7 +16,7 @@ public class ScheduleRepository : IScheduleRepository
 
     public async Task<ScheduleResponse?> GetSchedule(Guid id, DateTime seed, CancellationToken token)
     {
-        var company = await _context.Companies.FindAsync(id, token);
+        var company = await _context.Companies.FindAsync(new object?[] { id }, token);
         if (company is null)
             return null;
         
@@ -25,7 +25,7 @@ public class ScheduleRepository : IScheduleRepository
             .Where(
                 x => 
                     x.CompanyTypeId == company.CompanyTypeId && x.MarketId == company.MarketId &&
-                    x.Timestamp > lower && x.Timestamp < upper
+                    x.Timestamp >= lower && x.Timestamp <= upper
             ).ToArrayAsync(token);
         var formattedDates = notifications is not null && notifications.Length > 0
             ? notifications.Select(x => x.Timestamp.ToFormattedDate()).ToArray()
